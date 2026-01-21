@@ -7,3 +7,6 @@ from sklearn.ensemble import RandomForestClassifier
 data = pd.read_csv('concrete.csv')
 print(data.head())
 print(data.info())
+print(data.describe())
+
+print(data.keys())
