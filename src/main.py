@@ -1,16 +1,21 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+from preprocessing import DataPreprocessor
+from config import Config
 
-data = pd.read_csv('concrete.csv')
-print(data.head())
-print(data.info())
-print(data.describe())
+if __name__ == "__main__":
+    # Initialize the data preprocessor
+    preprocessor = DataPreprocessor()
 
-dup_sum = data.duplicated().sum()
-print(f"Number of duplicate rows: {dup_sum}")
-data = data.drop_duplicates()
-data = data.dropna()
-print(f"Data shape after cleaning: {data.shape}")
+    # Load the dataset
+    data = preprocessor.load_data(Config.DATA_PATH)
+
+    # Split into features and target
+    X, y = preprocessor.split_feature_target(data)
+
+    # Build the preprocessing pipeline
+    preprocessor.build_pipeline()
+
+    # Fit and transform the features
+    X_processed = preprocessor.fit_transform(X)
+
+    # Now X_processed is ready for model training
+    print("Preprocessing complete. Processed feature shape:", X_processed.shape)
