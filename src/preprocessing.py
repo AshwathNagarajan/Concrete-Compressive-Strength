@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -30,6 +31,7 @@ class DataPreprocessor:
 
         self.pipeline = None
         self.feature_names = None
+        self.processed_data_path = "data/processed/processed_concrete.csv"
 
     # -------------------------------------------------
     # Data Loading
@@ -107,12 +109,30 @@ class DataPreprocessor:
         )
 
     # -------------------------------------------------
+    # Save Processed Dataset
+    # -------------------------------------------------
+    def save_processed_data(self, X_processed, y):
+        os.makedirs(os.path.dirname(self.processed_data_path), exist_ok=True)
+
+        processed_df = pd.DataFrame(
+            X_processed,
+            columns=self.feature_names
+        )
+        processed_df[self.target_col] = y.values
+        processed_df.to_csv(self.processed_data_path, index=False)
+
+        print(f"✅ Processed dataset saved to: {self.processed_data_path}")
+
+    # -------------------------------------------------
     # Full Preprocessing Workflow
     # -------------------------------------------------
-    def preprocess(self, path):
-        data = self.load_data(path)
-        X, y = self.split_feature_target(data)
+    def preprocess(self, df: pd.DataFrame):
+        X, y = self.split_feature_target(df)
         self.build_pipeline()
         X_processed = self.fit_transform(X)
+
+        # Save full processed dataset
+        self.save_processed_data(X_processed, y)
+
         X_train, X_test, y_train, y_test = self.split_train_test(X_processed, y)
         return X_train, X_test, y_train, y_test
