@@ -50,8 +50,8 @@ class Config:
         "decision_tree",
         "random_forest",
         "gradient_boosting",
+        "xgboost",
     ]
-
     # Hyperparameters
     RIDGE_ALPHA = 1.0
     LASSO_ALPHA = 0.01
@@ -66,6 +66,12 @@ class Config:
     GB_N_ESTIMATORS = 200
     GB_LEARNING_RATE = 0.05
     GB_MAX_DEPTH = 3
+
+    XGB_N_ESTIMATORS = 200
+    XGB_LEARNING_RATE = 0.05
+    XGB_MAX_DEPTH = 5
+    XGB_SUBSAMPLE = 0.8
+    XGB_COLSAMPLE_BYTREE = 0.8
 
     # -------------------------------------------------
     # Persistence

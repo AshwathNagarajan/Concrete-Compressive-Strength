@@ -7,7 +7,7 @@ from config import Config
 
 
 def main():
-    print("\n🚀 Concrete Compressive Strength Prediction System\n")
+    print("\nConcrete Compressive Strength Prediction System\n")
 
     # -------------------------------------------------
     # 1. Load + Feature Engineering
@@ -16,37 +16,37 @@ def main():
     feature_engineer = FeatureEngineer()
     visualizer = Visualizer()
 
-    print("📥 Loading dataset...")
+    print("Loading dataset...")
     data = preprocessor.load_data(Config.DATA_PATH)
 
-    print("🧠 Performing feature engineering...")
+    print("Performing feature engineering...")
     data = feature_engineer.transform(data)
 
     # -------------------------------------------------
     # 2. Exploratory Visualizations
     # -------------------------------------------------
-    print("📊 Visualizing dataset...")
+    '''print("Visualizing dataset...")
     visualizer.plot_distributions(data)
     visualizer.plot_boxplots(data)
     visualizer.plot_correlation_heatmap(data)
-    visualizer.plot_feature_vs_target(data)
+    visualizer.plot_feature_vs_target(data)'''
 
     # -------------------------------------------------
     # 3. Preprocessing
     # -------------------------------------------------
-    print("⚙️ Preprocessing data...")
+    print("Preprocessing data...")
     X, y = preprocessor.split_feature_target(data)
-    preprocessor.preprocess_pipeline()
+    preprocessor.build_pipeline()
     X_processed = preprocessor.fit_transform(X)
 
-    X_train, X_test, y_train, y_test = preprocessor.train_test_split(X_processed, y)
+    X_train, X_test, y_train, y_test = preprocessor.split_train_test(X_processed, y)
 
     # -------------------------------------------------
-    # 4. Model Training (Auto Model Swap)
+    # 4. Model Training (Auto Model Selection)
     # -------------------------------------------------
-    print("🏗️ Training all models...")
+    print("Training all models...")
     trainer = Trainer()
-    results = trainer.train_all_models(X_train, y_train, X_test, y_test)
+    results = trainer.train(X_train, y_train, X_test, y_test)
 
     # -------------------------------------------------
     # 5. Model Evaluation & Selection
@@ -54,7 +54,7 @@ def main():
     evaluator = Evaluator()
     best_model_name, best_model, best_metrics = evaluator.select_best_model(results)
 
-    print("\n🏆 Best Model Selected")
+    print("\nBest Model Selected")
     print(f"Model : {best_model_name}")
     for k, v in best_metrics.items():
         print(f"{k} : {v:.4f}")
@@ -62,12 +62,12 @@ def main():
     # -------------------------------------------------
     # 6. Visualization of Best Model
     # -------------------------------------------------
-    print("\n📈 Visualizing best model predictions...")
+    print("\nVisualizing best model predictions...")
     y_pred = best_model.predict(X_test)
     visualizer.plot_predictions(y_test, y_pred)
     visualizer.plot_residuals(y_test, y_pred)
 
-    print("\n✅ Training pipeline completed successfully.")
+    print("\nTraining pipeline completed successfully.")
 
 
 if __name__ == "__main__":

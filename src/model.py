@@ -1,6 +1,7 @@
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from xgboost import XGBRegressor
 from config import Config
 
 
@@ -20,7 +21,7 @@ class ModelFactory:
             return Ridge(alpha=Config.RIDGE_ALPHA)
 
         elif model_name == "lasso":
-            return Lasso(alpha=Config.LASSO_ALPHA)
+            return Lasso(alpha=Config.LASSO_ALPHA, max_iter=10000)
 
         elif model_name == "elasticnet":
             return ElasticNet(
@@ -49,6 +50,18 @@ class ModelFactory:
                 learning_rate=Config.GB_LEARNING_RATE,
                 max_depth=Config.GB_MAX_DEPTH,
                 random_state=self.random_state
+            )
+
+        elif model_name == "xgboost":
+            return XGBRegressor(
+                n_estimators=Config.XGB_N_ESTIMATORS,
+                learning_rate=Config.XGB_LEARNING_RATE,
+                max_depth=Config.XGB_MAX_DEPTH,
+                subsample=Config.XGB_SUBSAMPLE,
+                colsample_bytree=Config.XGB_COLSAMPLE_BYTREE,
+                random_state=self.random_state,
+                n_jobs=-1,
+                verbosity=0
             )
 
         else:
