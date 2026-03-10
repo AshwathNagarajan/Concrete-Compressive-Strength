@@ -1,21 +1,18 @@
-============================================================
 CONCRETE COMPRESSIVE STRENGTH PREDICTION - RESULTS SUMMARY
-============================================================
-
-BEST MODEL: XGBoost
-  R² Score: 0.9552
-  RMSE: 3.3423 MPa
-  MAE: 2.1327 MPa
+BEST MODEL: Random Forest
+  R² Score: 0.9650
+  RMSE: 2.8577 MPa
+  MAE: 1.8036 MPa
 
 ALL MODELS:
 ------------------------------------------------------------
 Random Forest:
-  R² Score: 0.9519
-  RMSE: 3.4659 MPa
-  MAE: 1.9436 MPa
+  R² Score: 0.9650
+  RMSE: 2.8577 MPa
+  MAE: 1.8036 MPa
 
 XGBoost:
-  R² Score: 0.9552
-  RMSE: 3.3423 MPa
-  MAE: 2.1327 MPa
+  R² Score: 0.9614
+  RMSE: 2.9982 MPa
+  MAE: 1.9727 MPa
 
