@@ -1,24 +1,62 @@
 # Concrete Compressive Strength Prediction
 
-A simple machine learning project for predicting concrete compressive strength based on ingredient ratios and curing time.
+A modular machine learning project for predicting concrete compressive strength based on ingredient ratios and curing time.
 
 ## Project Overview
 
-This project implements a straightforward machine learning pipeline that:
-1. Loads concrete mixture data (2,114 samples with 8 ingredient features)
-2. Preprocesses data by normalizing features to the same scale
+This project implements a machine learning pipeline that:
+1. Loads concrete mixture data (2,105 samples with 8 ingredient features)
+2. Preprocesses data by normalizing features using StandardScaler
 3. Trains two regression models: Random Forest and XGBoost
 4. Evaluates both models on a held-out test set
-5. Generates visualizations to understand model performance and feature importance
+5. Generates visualizations for model performance and feature importance
+6. Provides interactive interface for training and making predictions
 
-**Best Result**: XGBoost or Random Forest typically achieve R² ≈ 0.90 (explains 90% of variance)
+**Performance**: Random Forest R² = 0.965, XGBoost R² = 0.961
 
 ## Dataset
 
-- **Total Samples**: 1,030 concrete mixtures
-- **Features**: 8 ingredient measurements (Cement, Slag, FlyAsh, Water, Superplasticizer, CoarseAggregate, FineAggregate, Age)
+- **Total Samples**: 2,105 concrete mixtures
+- **Features**: 8 ingredient measurements
+  - Cement (kg/m³)
+  - BlastFurnaceSlag (kg/m³)
+  - FlyAsh (kg/m³)
+  - Water (kg/m³)
+  - Superplasticizer (kg/m³)
+  - CoarseAggregate (kg/m³)
+  - FineAggregate (kg/m³)
+  - Age (days)
 - **Target**: Compressive Strength in MPa (megapascals)
 - **Train/Test Split**: 80% training, 20% testing
+
+## Project Structure
+
+```
+Concrete_CCS/
+├── main.py                    Interactive menu system
+├── requirements.txt           Project dependencies
+├── data/
+│   └── concrete.csv          Dataset file
+├── preprocessing/
+│   └── preprocess.py         Data loading and preprocessing
+├── random_forest/
+│   └── random_forest.py      Random Forest model training
+├── xg_boost/
+│   └── xg_boost.py           XGBoost model training
+├── evaluation/
+│   └── evaluator.py          Model evaluation metrics
+├── visualizations/
+│   └── visual.py             Plotting and visualization
+├── models/
+│   └── model.py              Model persistence utilities
+├── report/
+│   └── report.py             Results report generation
+├── predict/
+│   └── predict.py            Prediction module
+├── trainer/
+│   └── trainer.py            Training pipeline orchestration
+└── README.md                  This file
+```
 
 ## Installation
 
@@ -48,90 +86,64 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Run the complete pipeline
+### Interactive Menu
 ```bash
 python main.py
 ```
 
-This will:
-1. Load and explore the data
-2. Split into training (80%) and test (20%) sets
-3. Train Random Forest and XGBoost models
-4. Evaluate both models on test data
-5. Generate 3 visualization plots
-6. Save trained models and results
+Menu options:
+1. **Train new models** - Trains Random Forest and XGBoost models
+2. **Make predictions** - Interactive single prediction input
+3. **Batch predictions from CSV** - Predict for multiple samples
+4. **Exit** - Quit the program
 
-### Output Files
+### Train Models Only
+```bash
+python main.py
+```
+Select option 1 to train models and generate visualizations.
 
-After running, you'll find:
+### Make Single Predictions
+```bash
+python main.py
+```
+Select option 2 to input feature values and get predictions from both models.
+
+### Batch Predictions
+```bash
+python main.py
+```
+Select option 3 to load a CSV file with multiple samples and generate predictions.
+
+## Output Files
+
+After training, you'll find:
 - **results.txt** - Summary of model performance metrics
 - **models/** - Saved trained models (.pkl files)
-- **visualizations/** - Three PNG plots:
-  - `01_correlation_matrix.png` - Feature relationships
-  - `02_predictions_vs_actual.png` - Model accuracy visualization
-  - `03_feature_importance.png` - Most influential features
+  - `random_forest.pkl`
+  - `xgboost.pkl`
+- **visualizations/** - Three PNG plots
+  - `01_correlation_matrix.png` - Feature relationships heatmap
+  - `02_predictions_vs_actual.png` - Model accuracy comparison
+  - `03_feature_importance.png` - Feature importance for both models
 
-## Results Interpretation
+## Evaluation Metrics
 
-### Evaluation Metrics
+- **R² Score**: Proportion of variance explained by model (0-1, higher is better)
+  - 0.965 means model explains 96.5% of strength variation
 
-- **R² Score** (R-squared): Proportion of variance in target explained by model. Range: 0-1, higher is better.
-  - R² = 0.90 means model explains 90% of strength variation
-  
-- **RMSE** (Root Mean Squared Error): Average prediction error in MPa (megapascals). Lower is better.
-  - RMSE = 4.5 MPa means predictions are off by ~4.5 MPa on average
-  
-- **MAE** (Mean Absolute Error): Average absolute difference between predicted and actual. Lower is better.
-  - MAE = 3.2 MPa means typical error is 3.2 MPa
+- **RMSE**: Root Mean Squared Error in MPa (lower is better)
+  - 2.86 MPa means predictions are off by ~2.86 MPa on average
 
-### Expected Performance
+- **MAE**: Mean Absolute Error in MPa (lower is better)
+  - 1.80 MPa means typical error is 1.80 MPa
 
-| Model | R² Score | RMSE (MPa) |
-|-------|----------|-----------|
-| Random Forest | 0.88-0.92 | 4.5-6.0 |
-| XGBoost | 0.90-0.93 | 4.0-5.5 |
+## Model Comparison
 
-## Code Structure
-
-```
-main.py                    Main script with entire pipeline
-├── load_data()           Load CSV file
-├── split_data()          Train/test split (80/20)
-├── preprocess_data()     Normalize features using StandardScaler
-├── train_random_forest() Train Random Forest with 100 trees
-├── train_xgboost()       Train XGBoost with 100 boosting rounds
-├── evaluate_model()      Calculate R², RMSE, MAE metrics
-├── plot_*()              Create 3 visualization plots
-├── save_models()         Save trained models as .pkl files
-├── save_results()        Save metrics summary to text file
-└── main()                Orchestrate entire pipeline
-```
-
-## Key Concepts Explained
-
-### Data Preprocessing
-We normalize features using StandardScaler, which transforms each feature to have mean=0 and standard deviation=1. This helps models converge faster and perform better.
-
-### Train/Test Split
-We use 80% of data for training and 20% for testing. The test set simulates real-world, unseen data to evaluate model generalization.
-
-### Random Forest
-An ensemble method that trains multiple decision trees and averages their predictions. Good for capturing non-linear relationships.
-
-### XGBoost
-A boosting algorithm that trains trees sequentially, where each tree corrects previous tree's errors. Often more accurate than Random Forest.
-
-### Feature Importance
-Shows which input features have the most influence on predictions. Helps understand what drives concrete strength.
-
-## Potential Improvements (for future work)
-
-1. Feature Engineering: Create ratios like water-cement ratio
-2. Hyperparameter Tuning: Optimize model parameters using GridSearchCV
-3. Cross-Validation: Use k-fold CV for more robust evaluation
-4. Feature Selection: Remove less important features
-5. Model Comparison: Compare with other algorithms like Gradient Boosting
-6. Ensemble Methods: Combine predictions from multiple models
+| Model | R² Score | RMSE (MPa) | MAE (MPa) |
+|-------|----------|-----------|-----------|
+| Random Forest | 0.965 | 2.86 | 1.80 |
+| XGBoost | 0.961 | 3.00 | 1.97 |
 
 ## Technologies Used
 
@@ -141,258 +153,98 @@ Shows which input features have the most influence on predictions. Helps underst
 - **scikit-learn** - Machine Learning models and preprocessing
 - **XGBoost** - Gradient boosting library
 - **Matplotlib & Seaborn** - Data visualization
-- **joblib** - Model persistence
+- **pickle** - Model persistence
 
-## File Sizes
+## Key Features
 
-- `main.py`: ~400 lines (single file, easy to understand)
-- `requirements.txt`: 7 packages (minimal dependencies)
-- Total code: ~400 lines (not counting comments)
+### Modular Architecture
+- Separate modules for preprocessing, training, evaluation, and visualization
+- Easy to extend and maintain
+- Clean separation of concerns
 
-## Author
+### Training Pipeline
+- Automated data loading and exploration
+- Standardized feature scaling
+- Parallel model training
+- Comprehensive evaluation
 
-[Your Name]  
-B.E./B.Tech Student - 2nd Year  
-AI & Data Science Stream
+### Prediction System
+- Load pre-trained models
+- Single sample prediction with user input
+- Batch prediction from CSV files
+- Auto-preprocessing of new data
 
-## References
+### Visualizations
+- Correlation matrix heatmap
+- Actual vs Predicted scatter plots
+- Feature importance comparison
 
-- Dataset: UCI Machine Learning Repository (Concrete Compressive Strength)
-- scikit-learn: https://scikit-learn.org/
-- XGBoost: https://xgboost.readthedocs.io/
+## Dependencies
 
----
+See `requirements.txt`:
+- pandas==2.0.3
+- numpy==1.24.3
+- scikit-learn==1.3.1
+- xgboost==2.0.2
+- matplotlib==3.8.1
+- seaborn==0.13.0
 
-**Last Updated**: 2024
+## Future Improvements
 
-python src/main.py --data-path data/raw/concrete.csv
+1. **Hyperparameter Tuning**: GridSearchCV for optimal parameters
+2. **Feature Engineering**: Create derived features (water-cement ratio, etc.)
+3. **Cross-Validation**: K-fold CV for more robust evaluation
+4. **Additional Models**: Gradient Boosting, SVR, Neural Networks
+5. **Model Ensemble**: Combine predictions from multiple models
+6. **Web Interface**: REST API for predictions
 
-# Run only specific models
-python src/main.py --models linear ridge random_forest xgboost
+## Quick Start Example
 
-# Disable visualization
-python src/main.py --no-visualize
-
-# Custom number of CV folds
-python src/main.py --cv-folds 10
-
-# Custom test size
-python src/main.py --test-size 0.15
-```
-
-### Expected Output
-
-```
-Concrete Compressive Strength Prediction System
-
-Loading dataset...
-Performing feature engineering...
-Preprocessing data...
-Training all models...
-  🔹 Training linear...
-  🔹 Training ridge...
-  🔹 Training random_forest...
-  ...
-
-Best Model Selected
-Model : random_forest
-R2 : 0.9234
-RMSE : 4.5612
-MAE : 3.2456
-MAPE : 8.1234
-
-Visualizing best model predictions...
-✅ Model saved to model/best_model.pkl
-✅ Pipeline saved to model/preprocessing_pipeline.pkl
-✅ Results saved to model/model_comparison.csv
-Training pipeline completed successfully.
-```
-
-## Dataset
-
-The project uses the **UCI Concrete Compressive Strength Dataset** with the following features:
-
-| Feature | Unit | Description |
-|---------|------|-------------|
-| Cement | kg/m³ | Portland cement content |
-| BlastFurnaceSlag | kg/m³ | Slag content from blast furnaces |
-| FlyAsh | kg/m³ | Fly ash content |
-| Water | kg/m³ | Water content |
-| Superplasticizer | kg/m³ | Superplasticizer additive |
-| CoarseAggregate | kg/m³ | Coarse aggregate weight |
-| FineAggregate | kg/m³ | Fine aggregate weight |
-| Age | days | Age of concrete sample |
-| **Strength** | MPa | **Target: Compressive strength** |
-
-### Feature Engineering
-
-The pipeline creates domain-driven features:
-- **Water-Cement Ratio**: Water / Cement (fundamental concrete property)
-- **Binder Content**: Cement + Slag + FlyAsh (total binding material)
-- **Water-Binder Ratio**: Water / Binder Content (affects strength and durability)
-- **Interaction Terms**: Cement×Water, Cement×Age, Water×Age, Coarse/Fine Aggregate Ratio, Superplasticizer×Water
-
-## Models Benchmarked
-
-| Model | Type | Notes |
-|-------|------|-------|
-| Linear Regression | Linear | Baseline model |
-| Ridge | Linear | L2 regularization |
-| Lasso | Linear | L1 regularization (feature selection) |
-| ElasticNet | Linear | L1 + L2 regularization |
-| Decision Tree | Tree | Single tree regression |
-| Random Forest | Ensemble | 300 trees, parallel training |
-| Gradient Boosting | Ensemble | Sequential tree boosting |
-| XGBoost | Ensemble | Optimized gradient boosting |
-
-## Evaluation Metrics
-
-- **R² Score**: Coefficient of determination (0-1, higher is better)
-- **RMSE**: Root Mean Squared Error (lower is better)
-- **MAE**: Mean Absolute Error (lower is better)
-- **MAPE**: Mean Absolute Percentage Error (lower is better)
-
-## Key Findings
-
-After training and evaluation, the project produces:
-1. **Model Comparison Table** (`model/model_comparison.csv`) - All models ranked by R²
-2. **Actual vs Predicted Plot** - Scatter plot with diagonal reference line
-3. **Residuals Plot** - Error distribution analysis
-4. **Learning Curves** - Training vs validation performance across dataset sizes
-5. **Feature Importance** - For tree-based models
-6. **Cross-Validation Scores** - Distribution of performance across folds
-
-## Configuration
-
-Edit [src/config.py](src/config.py) to customize:
-
-```python
-# Data paths
-DATA_PATH = "data/raw/concrete.csv"
-TARGET_COL = "Strength"
-
-# Train-test split
-TEST_SIZE = 0.2
-RANDOM_STATE = 42
-
-# Preprocessing
-SCALER_TYPE = "standard"              # standard | robust | minmax | none
-DISTRIBUTION_TRANSFORM = "power"      # power | quantile | none
-
-# Hyperparameters
-RIDGE_ALPHA = 1.0
-RF_N_ESTIMATORS = 300
-XGB_LEARNING_RATE = 0.05
-# ... and many more
-
-# Cross-validation
-CV_FOLDS = 5
-
-# Model selection metric
-SELECTION_METRIC = "R2"               # R2 | RMSE | MAE | MAPE
-```
-
-## Testing
-
-Run the test suite:
 ```bash
-python -m pytest tests/
+# 1. Activate virtual environment (if needed)
+# Windows: venv\Scripts\activate
+# macOS/Linux: source venv/bin/activate
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run the program
+python main.py
+
+# 4. Select option 1 to train models
+# 5. Check models/ and visualizations/ directories for outputs
 ```
-
-Individual test modules:
-```bash
-python -m pytest tests/test_preprocessing.py -v
-python -m pytest tests/test_features.py -v
-python -m pytest tests/test_models.py -v
-```
-
-## Logging
-
-Logs are saved to `logs/concrete_ml.log` with detailed execution information:
-```
-2026-02-06 10:23:45 - INFO - Loading dataset from data/raw/concrete.csv
-2026-02-06 10:23:46 - INFO - Dataset shape: (1030, 8)
-2026-02-06 10:23:47 - INFO - Performing feature engineering...
-2026-02-06 10:24:12 - INFO - Training random_forest with CV...
-```
-
-## Performance
-
-Typical results on the concrete dataset:
-
-| Model | R² | RMSE | MAE |
-|-------|-----|--------|--------|
-| Linear | 0.56 | 10.22 | 8.15 |
-| Ridge | 0.61 | 9.45 | 7.42 |
-| Random Forest | **0.92** | **4.56** | **3.24** |
-| XGBoost | **0.91** | **4.89** | **3.45** |
-
-*Note: Actual results depend on preprocessing settings and hyperparameters.*
-
-## Development Guidelines
-
-### Adding a New Model
-
-1. **Add hyperparameters to config.py**:
-   ```python
-   NEWMODEL_PARAM1 = value
-   NEWMODEL_PARAM2 = value
-   ```
-
-2. **Add to model factory in model.py**:
-   ```python
-   elif model_name == "newmodel":
-       return NewModel(param1=Config.NEWMODEL_PARAM1, ...)
-   ```
-
-3. **Add to MODELS list in config.py**:
-   ```python
-   MODELS = [..., "newmodel"]
-   ```
-
-### Adding a New Feature
-
-1. **Create method in features.py**:
-   ```python
-   def add_new_feature(self, df: pd.DataFrame) -> pd.DataFrame:
-       df = df.copy()
-       df["NewFeature"] = ...
-       return df
-   ```
-
-2. **Add to transform() method**:
-   ```python
-   def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-       ...
-       df = self.add_new_feature(df)
-       return df
-   ```
 
 ## Troubleshooting
 
-**ImportError: No module named 'xgboost'**
+**File not found errors**
+- Ensure data/concrete.csv exists
+- Make sure you're running from the project root directory
+
+**ImportError for xgboost**
 ```bash
 pip install xgboost
 ```
 
-**Convergence warnings with Lasso**
-- These are safe to ignore (handled in trainer.py)
-- Increase `max_iter` in model.py if needed
+**Memory issues**
+- Reduce data size in configuration
+- Close other applications
 
-**Memory issues with large datasets**
-- Reduce `RF_N_ESTIMATORS` and `GB_N_ESTIMATORS` in config.py
-- Set `n_jobs=1` for models in model.py instead of `-1`
+**Prediction errors**
+- Ensure all 8 feature values are numeric
+- Verify feature order matches training data
 
-## License
+## References
 
-This project is provided as-is for educational and research purposes.
-
-## Contact & Support
-
-For issues, feature requests, or improvements, please open an issue on the repository.
+- Dataset: UCI Machine Learning Repository - Concrete Compressive Strength
+- scikit-learn: https://scikit-learn.org/
+- XGBoost: https://xgboost.readthedocs.io/
+- pandas: https://pandas.pydata.org/
+- Matplotlib: https://matplotlib.org/
 
 ---
 
-**Last Updated**: February 6, 2026
-**Python Version**: 3.9+
-**Status**: Active Development
+**Last Updated**: March 10, 2026
+**Python Version**: 3.8+
+**Status**: Active
+

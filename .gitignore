@@ -41,9 +41,8 @@ env/
 *.ipynb
 
 # Models and data
-model/*.pkl
-model/*.joblib
-data/processed/
+models/*.pkl
+data/
 *.csv
 
 # Environment
@@ -56,3 +55,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+#Models
+models/trained/
