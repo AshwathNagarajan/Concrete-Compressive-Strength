@@ -2,11 +2,6 @@ from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 import numpy as np
 
 class Evaluator:
-    
-    def __init__(self, model, X_test, y_test):
-        self.model = model
-        self.X_test = X_test
-        self.y_test = y_test
 
     def evaluate_model(self, model, X_test, y_test, model_name):
         y_pred = model.predict(X_test)

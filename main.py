@@ -1,104 +1,44 @@
 import os
-import sys
-from preprocessing.preprocess import Preprocessing
-from random_forest.random_forest import RandomForest
-from xg_boost.xg_boost import XGBoostModel
-from evaluation.evaluator import Evaluator
-from visualizations.visual import Plot
-from models.model import ModelSaver
-from report.report import Report
-
-
-RANDOM_STATE = 42
-TEST_SIZE = 0.2
-DATA_PATH = "data/concrete.csv"
-TARGET_COLUMN = "strength"
-MODEL_DIR = "models"
-VIZ_DIR = "visualizations"
-
-
-os.makedirs(MODEL_DIR, exist_ok=True)
-os.makedirs(VIZ_DIR, exist_ok=True)
+from trainer.trainer import Trainer
+from predict.predict import Predictor
 
 
 def main():
+    while True:
+        print("\nConcrete Strength Predictor")
+        print("1. Train models")
+        print("2. Predict")
+        print("3. Exit")
 
-    print("=" * 70)
-    print("CONCRETE COMPRESSIVE STRENGTH PREDICTION PIPELINE")
-    print("=" * 70)
-    
-    print("\n[Step 1/6] Initializing data pipeline...")
-    preprocessor = Preprocessing(DATA_PATH, TARGET_COLUMN)
-    
-    print("\n[Step 2/6] Loading and exploring data...")
-    df = preprocessor.load_data()
-    
-    X = df.drop(columns=[TARGET_COLUMN])
-    y = df[TARGET_COLUMN]
-    feature_names = X.columns.tolist()
-    print(f"\nFeatures: {feature_names}")
-    
-    print("\n[Step 3/6] Splitting data...")
-    X_train, X_test, y_train, y_test = preprocessor.split_data(
-        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE
-    )
-    
-    X_train_scaled = preprocessor.preprocess_data(X_train, fit=True)
-    X_test_scaled = preprocessor.preprocess_data(X_test, fit=False)
-    
-    print("\n[Step 4/6] Training models...")
-    
-    rf_trainer = RandomForest(
-        n_estimators=100, 
-        max_depth=20, 
-        random_state=RANDOM_STATE
-    )
-    rf_trainer.train_random_forest(X_train_scaled, y_train)
-    rf_model = rf_trainer.model
-    
-    xgb_trainer = XGBoostModel(
-        n_estimators=100,
-        learning_rate=0.1,
-        max_depth=6,
-        random_state=RANDOM_STATE
-    )
-    xgb_trainer.train_xgboost(X_train_scaled, y_train)
-    xgb_model = xgb_trainer.model
-    
-    print("\n[Step 5/6] Evaluating models...")
-    
-    evaluator = Evaluator(rf_model, X_test_scaled, y_test)
-    rf_results = evaluator.evaluate_model(rf_model, X_test_scaled, y_test, "Random Forest")
-    
-    evaluator_xgb = Evaluator(xgb_model, X_test_scaled, y_test)
-    xgb_results = evaluator_xgb.evaluate_model(xgb_model, X_test_scaled, y_test, "XGBoost")
-    
-    results = [rf_results, xgb_results]
-    
-    print("\n[Step 6/6] Generating visualizations and saving outputs...")
-    
-    plotter = Plot(VIZ_DIR)
-    
-    plotter.plot_correlation_matrix(X, y)
-    plotter.plot_predictions_vs_actual(y_test, results)
-    
-    models_dict = {"Random Forest": rf_model, "XGBoost": xgb_model}
-    plotter.plot_feature_importance(models_dict, feature_names)
-    
-    saver = ModelSaver(MODEL_DIR)
-    saver.save_models(models_dict)
-    
-    reporter = Report()
-    reporter.save_results(results)
-    
-    print("\n" + "=" * 70)
-    print("PIPELINE COMPLETED SUCCESSFULLY")
-    print("=" * 70)
-    print(f"✓ Models saved to: {MODEL_DIR}/")
-    print(f"✓ Visualizations saved to: {VIZ_DIR}/")
-    print(f"✓ Results summary saved to: results.txt")
-    print("=" * 70)
-        
+        choice = input("Choose option: ")
+
+        if choice == "1":
+            Trainer().trainer()
+
+        elif choice == "2":
+
+            print("\nSelect model:")
+            print("1. Random Forest")
+            print("2. XGBoost")
+            print("3. Both")
+
+            model_choice = input("Choose model (1-3): ")
+
+            if model_choice == "1":
+                model = "rf"
+            elif model_choice == "2":
+                model = "xgb"
+            else:
+                model = "both"
+
+            predictor = Predictor()
+            predictor.predict(model_choice=model)
+        elif choice == "3":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid choice")
 
 
 if __name__ == "__main__":
