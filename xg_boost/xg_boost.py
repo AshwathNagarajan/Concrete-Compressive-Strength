@@ -1,9 +1,6 @@
 
 from xgboost import XGBRegressor
 
-    
-
-
 class XGBoostModel:
     def __init__(self, n_estimators=100, learning_rate=0.1, max_depth=6, random_state=42):
         self.n_estimators = n_estimators

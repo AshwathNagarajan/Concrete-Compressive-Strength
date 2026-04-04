@@ -35,10 +35,8 @@ class Trainer:
         print("CONCRETE COMPRESSIVE STRENGTH PREDICTION PIPELINE")
         print("=" * 70)
         
-        print("\n[Step 1/6] Initializing data pipeline...")
         preprocessor = self.preprocessor
         
-        print("\n[Step 2/6] Loading and exploring data...")
         df = preprocessor.load_data()
         
         X = df.drop(columns=[TARGET_COLUMN])
@@ -46,7 +44,6 @@ class Trainer:
         feature_names = X.columns.tolist()
         print(f"\nFeatures: {feature_names}")
         
-        print("\n[Step 3/6] Splitting data...")
         X_train, X_test, y_train, y_test = preprocessor.split_data(
             X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE
         )
@@ -54,7 +51,6 @@ class Trainer:
         X_train_scaled = preprocessor.preprocess_data(X_train, fit=True)
         X_test_scaled = preprocessor.preprocess_data(X_test, fit=False)
         
-        print("\n[Step 4/6] Training models...")
         
         rf_trainer = self.rf_trainer
         rf_trainer.train_random_forest(X_train_scaled, y_train)
@@ -64,12 +60,10 @@ class Trainer:
         xgb_trainer.train_xgboost(X_train_scaled, y_train)
         xgb_model = xgb_trainer.model
         
-        print("\n[Step 5/6] Evaluating models...")
         
         rf_results = self.evaluator.evaluate_model(rf_model, X_test_scaled, y_test, "Random Forest")
         xgb_results = self.evaluator.evaluate_model(xgb_model, X_test_scaled, y_test, "XGBoost")
         
-        print("\n[Step 6/6] Generating visualizations and saving outputs...")
         
         plotter = self.plotter
         
@@ -84,12 +78,5 @@ class Trainer:
         
         reporter = self.reporter
         reporter.save_results([rf_results, xgb_results])
-        
-        print("\n" + "=" * 70)
-        print("PIPELINE COMPLETED SUCCESSFULLY")
-        print("=" * 70)
-        print(f"Models saved to: {MODEL_DIR}/")
-        print(f"Visualizations saved to: {VIZ_DIR}/")
-        print(f"Results summary saved to: results.txt")
-        print("=" * 70)
+
         

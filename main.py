@@ -11,10 +11,8 @@ def main():
         print("3. Exit")
 
         choice = input("Choose option: ")
-
         if choice == "1":
             Trainer().trainer()
-
         elif choice == "2":
 
             print("\nSelect model:")
