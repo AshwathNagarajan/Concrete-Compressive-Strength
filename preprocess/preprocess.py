@@ -9,17 +9,11 @@ def load_data(path):
 
 def feature_engineering(df):
     df = df.copy()
-
     df["water_cement_ratio"] = df["water"] / (df["cement"] + 1e-6)
-
     df["total_binder"] = df["cement"] + df["blastfurnaceslag"] + df["flyash"]
-
     df["agg_ratio"] = df["coarseaggregate"] / (df["fineaggregate"] + 1e-6)
-
     df["log_age"] = np.log1p(df["age"])
-
     df["binder_water_ratio"] = df["total_binder"] / (df["water"] + 1e-6)
-
     return df
 
 
