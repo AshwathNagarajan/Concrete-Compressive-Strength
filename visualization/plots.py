@@ -11,6 +11,7 @@ def plot_correlation_heatmap(df):
     plt.yticks(range(len(corr.columns)), corr.columns)
     plt.title("Correlation Heatmap")
     plt.tight_layout()
+    plt.savefig("correlation_heatmap.png")
     plt.show()
 
 
@@ -24,6 +25,7 @@ def plot_model_comparison(results):
     plt.title("Model Comparison")
     plt.xticks(rotation=30)
     plt.tight_layout()
+    plt.savefig("model_comparison.png")
     plt.show()
 
 
@@ -39,10 +41,9 @@ def plot_actual_vs_predicted(y_test, y_pred, model_name):
     plt.plot([min_val, max_val], [min_val, max_val], linestyle="--")
 
     plt.tight_layout()
+    plt.savefig(f"actual_vs_predicted_{model_name}.png")
     plt.show()
 
-
-import matplotlib.pyplot as plt
 
 
 def plot_all_feature_importance(trained_models, feature_names):
@@ -70,4 +71,5 @@ def plot_all_feature_importance(trained_models, feature_names):
         ax.set_xlabel("Importance")
 
     plt.tight_layout()
+    plt.savefig("feature_importance_comparison.png")
     plt.show()

@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import pickle
+from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 
 
@@ -27,4 +29,16 @@ def scale_data(X_train, X_test):
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
-    return X_train, X_test
+    return X_train, X_test, scaler
+
+
+def save_model_pkl(model, path):
+    model_path = Path(path)
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    with model_path.open("wb") as file:
+        pickle.dump(model, file)
+
+
+def load_model_pkl(path):
+    with Path(path).open("rb") as file:
+        return pickle.load(file)
