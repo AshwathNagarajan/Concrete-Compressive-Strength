@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc
 
 
 def plot_correlation_heatmap(df):
@@ -43,6 +44,30 @@ def plot_actual_vs_predicted(y_test, y_pred, model_name):
     plt.tight_layout()
     plt.savefig(f"actual_vs_predicted_{model_name}.png")
     plt.show()
+
+
+def plot_roc_auc_comparison(y_true_binary, model_scores):
+    plt.figure(figsize=(8, 6))
+    auc_scores = {}
+
+    for model_name, scores in model_scores.items():
+        fpr, tpr, _ = roc_curve(y_true_binary, scores)
+        roc_auc = auc(fpr, tpr)
+        auc_scores[model_name] = roc_auc
+        plt.plot(fpr, tpr, label=f"{model_name} (AUC={roc_auc:.3f})")
+
+    plt.plot([0, 1], [0, 1], linestyle="--", color="gray", label="Random")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve Comparison")
+    plt.legend(loc="lower right")
+    plt.tight_layout()
+    plt.savefig("roc_auc_comparison.png")
+    plt.show()
+
+    return auc_scores
 
 
 

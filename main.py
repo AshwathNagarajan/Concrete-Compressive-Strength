@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 
@@ -22,6 +23,7 @@ from visualization.plots import (
     plot_correlation_heatmap,
     plot_model_comparison,
     plot_actual_vs_predicted,
+    plot_roc_auc_comparison,
     plot_all_feature_importance,
 )
 
@@ -53,10 +55,13 @@ kf = KFold(n_splits=5, shuffle=True, random_state=42)
 results = {}
 trained_models = {}
 predictions = {}
+actual_vs_pred_df = pd.DataFrame({"Actual": np.asarray(y_test)})
 
 print("\nResults:\n")
 
 scale_sensitive_models = {"SVM", "KNN", "MLP", "Linear"}
+strength_threshold = y_train.median()
+y_test_binary = (np.asarray(y_test) >= strength_threshold).astype(int)
 
 for name, model in models.items():
     print(f"Running {name}...")
@@ -86,12 +91,22 @@ for name, model in models.items():
     results[name] = r2
     trained_models[name] = model
     predictions[name] = preds
+    actual_vs_pred_df[f"{name}_Predicted"] = np.asarray(preds)
+    plot_actual_vs_predicted(y_test, preds, name)
 
 print("\nFinal Ranking:\n")
 for k, v in sorted(results.items(), key=lambda x: x[1], reverse=True):
     print(f"{k}: {v:.4f}")
 plot_model_comparison(results)
-
+actual_vs_pred_df.to_csv("actual_vs_predicted_all_models.csv", index=False)
+print("Saved: actual_vs_predicted_all_models.csv")
+auc_scores = plot_roc_auc_comparison(y_test_binary, predictions)
+print(f"ROC threshold (median train strength): {strength_threshold:.4f}")
+print("AUC Scores:\n")
+for model_name, auc_score in sorted(auc_scores.items(), key=lambda x: x[1], reverse=True):
+    print(f"{model_name}: {auc_score:.4f}")
+print("Saved: roc_auc_comparison.png")
+print("\n")
 best_model_name = max(results, key=results.get)
 
 best_model = trained_models[best_model_name]
@@ -109,7 +124,6 @@ else:
 
 print(f"Best model: {best_model_name}")
 print(f"Best model saved at: {model_path}")
-plot_actual_vs_predicted(y_test, best_preds, best_model_name)
 
 plot_all_feature_importance(trained_models, feature_names)
 
@@ -148,9 +162,9 @@ user_features["binder_water_ratio"] = (
     user_features["total_binder"] / (user_features["water"] + 1e-6)
 )
 
-user_input_row = np.array(
+user_input_row = pd.DataFrame(
     [[float(user_features[col]) for col in feature_names]],
-    dtype=float,
+    columns=feature_names
 )
 
 if best_model_name in scale_sensitive_models:
