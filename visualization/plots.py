@@ -16,17 +16,36 @@ def plot_correlation_heatmap(df):
     plt.show()
 
 
-def plot_model_comparison(results):
+def plot_model_comparison(results, title="Model Comparison", output_path="model_comparison.png"):
     names = list(results.keys())
     scores = list(results.values())
+    y_min = min(scores)
+    y_max = max(scores)
+    y_range = max(y_max - y_min, 1e-6)
+    label_offset = 0.02 * y_range
 
     plt.figure(figsize=(8, 5))
-    plt.bar(names, scores)
+    colors = plt.cm.Set2(range(len(names)))
+    bars = plt.bar(names, scores, color=colors, edgecolor="black", linewidth=0.8)
+
+    for bar, score in zip(bars, scores):
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + label_offset,
+            f"{score:.3f}",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+
     plt.ylabel("R2 Score")
-    plt.title("Model Comparison")
+    plt.title(title)
+    plt.grid(axis="y", linestyle="--", alpha=0.35)
+    plt.ylim(y_min - 0.1 * y_range, y_max + 0.15 * y_range)
     plt.xticks(rotation=30)
     plt.tight_layout()
-    plt.savefig("model_comparison.png")
+    plt.savefig(output_path)
     plt.show()
 
 
